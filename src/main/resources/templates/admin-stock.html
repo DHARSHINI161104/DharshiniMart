@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Admin Stock')}"></head>
+<body>
+<header th:replace="~{fragments :: navbar(${user})}"></header>
+<main class="container">
+  <h2 style="color:#0e153a;margin:18px 0">⚙️ Stock Management — Admin</h2>
+  <div th:if="${success}" class="mart-alert success" th:text="${success}"></div>
+
+  <!-- Add product form -->
+  <div class="form-card" style="margin-bottom:16px">
+    <h3>Add New Product</h3>
+    <form th:action="@{/admin/product/add}" method="post" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;align-items:end">
+      <div><label>Name</label><input type="text" name="name" required></div>
+      <div><label>Category</label><select name="category" required><option th:each="c : ${categories}" th:value="${c}" th:text="${c.displayName}"></option></select></div>
+      <div><label>Price ₹</label><input type="number" step="0.01" name="price" required></div>
+      <div><label>Unit</label><input type="text" name="unit" placeholder="kg/litre/packet" required></div>
+      <div><label>Stock</label><input type="number" step="0.1" name="stock" required></div>
+      <div><label>Min Stock</label><input type="number" step="0.1" name="minStock" required></div>
+      <div><label>Discount %</label><input type="number" name="discount" value="0" min="0" max="100"></div>
+      <div><label>Image (emoji)</label><input type="text" name="image" placeholder="🍎"></div>
+      <div style="grid-column:1/-1"><label>Description</label><input type="text" name="description" placeholder="Product description"></div>
+      <div><button class="btn btn-primary" type="submit">Add Product</button></div>
+    </form>
+  </div>
+
+  <!-- Filters -->
+  <form class="mart-controls" method="get" th:action="@{/admin/stock}">
+    <div class="search-wrap">
+      <input type="text" name="search" th:value="${search}" placeholder="Search products...">
+      <input type="hidden" name="category" th:value="${selectedCategory}">
+      <input type="hidden" name="stockFilter" th:value="${stockFilter}">
+      <button class="btn btn-primary" type="submit">Search</button>
+      <a th:href="@{/admin/stock}" class="btn" style="background:#dfe6e9;color:#2d3436;text-decoration:none;padding:12px 16px;border-radius:8px">Clear</a>
+    </div>
+    <div class="filter-chips">
+      <a th:href="@{/admin/stock(search=${search},stockFilter='all')}" th:classappend="${stockFilter=='all'} ? 'active' : ''" class="chip">All</a>
+      <a th:href="@{/admin/stock(search=${search},stockFilter='in')}" th:classappend="${stockFilter=='in'} ? 'active' : ''" class="chip">In Stock</a>
+      <a th:href="@{/admin/stock(search=${search},stockFilter='low')}" th:classappend="${stockFilter=='low'} ? 'active' : ''" class="chip">Low Stock</a>
+      <a th:href="@{/admin/stock(search=${search},stockFilter='out')}" th:classappend="${stockFilter=='out'} ? 'active' : ''" class="chip">Out of Stock</a>
+    </div>
+  </form>
+  <div class="filter-chips" style="margin:10px 0">
+    <a th:href="@{/admin/stock(search=${search},stockFilter=${stockFilter})}" th:classappend="${selectedCategory=='ALL'} ? 'active' : ''" class="chip">All Categories</a>
+    <a th:each="cat : ${categories}" th:href="@{/admin/stock(category=${cat.name()},search=${search},stockFilter=${stockFilter})}" th:text="${cat.displayName}" th:classappend="${selectedCategory==cat.name()} ? 'active' : ''" class="chip">Cat</a>
+  </div>
+
+  <!-- Table -->
+  <div style="overflow-x:auto">
+  <table class="admin-table">
+    <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Min</th><th>Discount</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr th:each="p : ${products}">
+        <td><span th:text="${p.image}">🍎</span> <strong th:text="${p.name}">Tomato</strong><div style="font-size:0.8rem;color:#636e72" th:text="'#' + ${p.id}"></div></td>
+        <td th:text="${p.category.displayName}">Veg</td>
+        <td th:text="'₹' + ${p.price} + '/' + ${p.unit}">₹40/kg</td>
+        <td th:text="${p.stock} + ' ' + ${p.unit}">25 kg</td>
+        <td><span class="stock-pill" th:classappend="${p.stockStatusClass}" th:text="${p.stockStatus}">In Stock</span></td>
+        <td th:text="${p.minStock}">8</td>
+        <td th:text="${p.discount}+'%'">0%</td>
+        <td>
+          <div class="admin-actions">
+            <details style="position:relative">
+              <summary class="btn-sm-mini btn-edit" style="list-style:none;cursor:pointer">Edit</summary>
+              <div style="position:absolute;right:0;top:28px;background:#fff;padding:14px;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.12);width:300px;z-index:10">
+                <form th:action="@{/admin/product/{id}/edit(id=${p.id})}" method="post" style="display:flex;flex-direction:column;gap:6px">
+                  <input type="text" name="name" th:value="${p.name}" required>
+                  <select name="category"><option th:each="c : ${categories}" th:value="${c}" th:text="${c.displayName}" th:selected="${c==p.category}"></option></select>
+                  <input type="number" step="0.01" name="price" th:value="${p.price}" required>
+                  <input type="text" name="unit" th:value="${p.unit}" required>
+                  <input type="number" step="0.1" name="stock" th:value="${p.stock}" required>
+                  <input type="number" step="0.1" name="minStock" th:value="${p.minStock}" required>
+                  <input type="number" name="discount" th:value="${p.discount}" min="0" max="100">
+                  <input type="text" name="image" th:value="${p.image}">
+                  <input type="text" name="description" th:value="${p.description}">
+                  <button class="btn-sm-mini btn-edit" type="submit">Save</button>
+                </form>
+              </div>
+            </details>
+            <form th:action="@{/admin/product/{id}/stock(id=${p.id})}" method="post" class="inline-form"><input type="hidden" name="delta" value="5"><button class="btn-sm-mini btn-stock" title="Add 5">+5</button></form>
+            <form th:action="@{/admin/product/{id}/stock(id=${p.id})}" method="post" class="inline-form"><input type="hidden" name="delta" value="-5"><button class="btn-sm-mini" style="background:#fdcb6e" title="Remove 5">-5</button></form>
+            <form th:action="@{/admin/product/{id}/delete(id=${p.id})}" method="post" class="inline-form" onsubmit="return confirm('Delete '+this.dataset.name)" th:attr="data-name=${p.name}"><button class="btn-sm-mini btn-delete">Delete</button></form>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <div th:if="${products.isEmpty()}" class="mart-alert info">No products match the filter.</div>
+</main>
+</body>
+</html>

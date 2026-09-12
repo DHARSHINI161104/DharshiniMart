@@ -4,8 +4,11 @@ import com.dharshinimart.config.AuthInterceptor;
 import com.dharshinimart.dto.LoginRequest;
 import com.dharshinimart.dto.RegisterRequest;
 import com.dharshinimart.exception.AuthException;
+import com.dharshinimart.model.Category;
 import com.dharshinimart.model.User;
 import com.dharshinimart.service.AuthService;
+import com.dharshinimart.service.CartService;
+import com.dharshinimart.service.ProductService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -14,14 +17,19 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class AuthController {
 
     private final AuthService authService;
+    private final ProductService productService;
+    private final CartService cartService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, ProductService productService, CartService cartService) {
         this.authService = authService;
+        this.productService = productService;
+        this.cartService = cartService;
     }
 
     @GetMapping("/")
@@ -76,9 +84,18 @@ public class AuthController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard(HttpSession session, Model model) {
+    public String dashboard(@RequestParam(required = false) String category,
+                            @RequestParam(required = false) String search,
+                            HttpSession session, Model model) {
         User user = (User) session.getAttribute(AuthInterceptor.SESSION_USER);
         model.addAttribute("user", user);
+        model.addAttribute("products", productService.filter(category, search));
+        model.addAttribute("categories", Category.values());
+        model.addAttribute("selectedCategory", category == null ? "ALL" : category);
+        model.addAttribute("search", search == null ? "" : search);
+        model.addAttribute("cartCount", cartService.getCartCount(session));
+        model.addAttribute("lowStockProducts", productService.findLowStock());
+        model.addAttribute("offers", productService.findOffers());
         return "dashboard";
     }
 

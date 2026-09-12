@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Shop')}"></head>
+<body>
+<header th:replace="~{fragments :: navbar(${user})}"></header>
+<main class="container">
+  <h2 style="color:#0e153a;margin:18px 0">All Products</h2>
+  <form class="mart-controls" method="get" th:action="@{/shop}">
+    <div class="search-wrap">
+      <input type="text" name="search" th:value="${search}" placeholder="Search products...">
+      <button class="btn btn-primary" type="submit">Search</button>
+      <a th:href="@{/shop}" class="btn" style="background:#dfe6e9;color:#2d3436;text-decoration:none;padding:12px 16px;border-radius:8px">Clear</a>
+    </div>
+    <div class="filter-chips">
+      <a th:href="@{/shop(search=${search})}" th:classappend="${selectedCategory=='ALL'} ? 'active' : ''" class="chip">All</a>
+      <a th:each="cat : ${categories}" th:href="@{/shop(category=${cat.name()}, search=${search})}" th:text="${cat.displayName}" th:classappend="${selectedCategory==cat.name()} ? 'active' : ''" class="chip">Fruits</a>
+    </div>
+  </form>
+  <div th:if="${products.isEmpty()}" class="mart-alert info">No products found.</div>
+  <div class="product-grid">
+    <div th:each="p : ${products}" class="product-card">
+      <span th:if="${p.discount > 0}" class="pc-badge" th:text="${p.discount} + '% OFF'"></span>
+      <span th:if="${p.stock <= 0}" class="pc-badge out">OUT OF STOCK</span>
+      <a th:href="@{/product/{id}(id=${p.id})}" style="text-decoration:none;color:inherit"><div class="pc-image" th:text="${p.image}">🍎</div></a>
+      <div class="pc-body">
+        <div class="pc-cat" th:text="${p.category.displayName}"></div>
+        <a th:href="@{/product/{id}(id=${p.id})}"><div class="pc-name" th:text="${p.name}"></div></a>
+        <div class="pc-price-row"><span class="pc-price" th:text="'₹' + ${p.discount > 0 ? p.discountedPrice : p.price} + '/' + ${p.unit}"></span><span th:if="${p.discount > 0}" class="pc-mrp" th:text="'₹' + ${p.price}"></span></div>
+        <div class="pc-stock" th:classappend="${p.stockStatusClass}" th:text="${p.stockStatus} + ' • ' + ${p.stock} + ' ' + ${p.unit}"></div>
+        <form th:action="@{/cart/add}" method="post" style="display:flex;gap:6px;margin-top:6px"><input type="hidden" name="productId" th:value="${p.id}"><input type="number" name="quantity" value="1" min="1" style="width:60px;padding:6px;border:1px solid #dfe6e9;border-radius:6px"><button class="btn-cart" th:disabled="${p.stock <= 0}">Add to Cart</button></form>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

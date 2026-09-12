@@ -2,35 +2,117 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('Dashboard')}"></head>
 <body>
-
 <header th:replace="~{fragments :: navbar(${user})}"></header>
 
-<main class="container">
-    <section class="welcome">
-        <h1>Welcome back, <span th:text="${user.name}">User</span>!</h1>
-        <p th:text="'You are logged in as a ' + ${user.role}">Role</p>
-    </section>
-
-    <section class="features">
-        <div class="card">
-            <h3>Browse Products</h3>
-            <p>Explore the catalog, search and filter by category.</p>
-        </div>
-        <div class="card" th:if="${user.role.name() == 'SELLER'}">
-            <h3>Seller Tools</h3>
-            <p>Add, edit and delete your products. Track received orders.</p>
-        </div>
-        <div class="card" th:if="${user.role.name() == 'ADMIN'}">
-            <h3>Admin Tools</h3>
-            <p>View all users, manage orders, and remove inappropriate products.</p>
-        </div>
-    </section>
-
-    <div class="upcoming">
-        <h3>Coming in the next weeks</h3>
-        <p>Product catalog, shopping cart, checkout, order history, admin panel and reviews.</p>
+<section class="mart-top">
+  <div class="container mart-top-inner">
+    <div class="mart-welcome">
+      <h1>Welcome back, <span th:text="${user.name}">User</span>! 🛒</h1>
+      <p><span th:text="${user.role}">BUYER</span> • <span th:text="${user.email}">email</span> • Dharshini Mart - Your Trusted Grocery Partner</p>
     </div>
-</main>
+    <div class="mart-stats">
+      <div class="stat-card"><strong th:text="${products.size()}">0</strong><span>Products</span></div>
+      <div class="stat-card green"><strong th:text="${offers.size()}">0</strong><span>Offers Live</span></div>
+      <div class="stat-card orange"><strong th:text="${lowStockProducts.size()}">0</strong><span>Low Stock</span></div>
+      <div class="stat-card blue"><strong th:text="${cartCount}">0</strong><span>In Cart</span></div>
+    </div>
+  </div>
+</section>
 
+<main class="container">
+  <div th:if="${success}" class="mart-alert success" th:text="${success}"></div>
+  <div th:if="${error}" class="mart-alert out" th:text="${error}"></div>
+
+  <!-- Low stock alert -->
+  <div th:if="${!lowStockProducts.isEmpty()}" class="mart-alert low">
+    ⚠️ <strong>Low Stock Alert:</strong>
+    <span th:each="p,iter : ${lowStockProducts}" th:text="${p.name} + ' (' + ${p.stock} + ' ' + ${p.unit} + ')' + (${iter.last} ? '' : ', ')"></span>
+    — restock soon!
+  </div>
+
+  <!-- Search & Filters -->
+  <form class="mart-controls" method="get" th:action="@{/dashboard}">
+    <div class="search-wrap">
+      <input type="text" name="search" th:value="${search}" placeholder="Search rice, tomato, milk...">
+      <button class="btn btn-primary" type="submit">Search</button>
+      <a th:if="${search != '' or selectedCategory != 'ALL'}" class="btn" style="background:#dfe6e9;color:#2d3436;text-decoration:none;padding:12px 16px;border-radius:8px" th:href="@{/dashboard}">Clear</a>
+    </div>
+    <div class="filter-chips">
+      <a th:href="@{/dashboard(search=${search})}" th:classappend="${selectedCategory=='ALL'} ? 'active' : ''" class="chip">All</a>
+      <a th:each="cat : ${categories}" th:href="@{/dashboard(category=${cat.name()}, search=${search})}" th:text="${cat.displayName}" th:classappend="${selectedCategory==cat.name()} ? 'active' : ''" class="chip">Fruits</a>
+    </div>
+  </form>
+
+  <!-- Category quick grid -->
+  <div class="cat-grid">
+    <a th:each="cat : ${categories}" th:href="@{/dashboard(category=${cat.name()})}" class="cat-card">
+      <div class="cat-icon" th:switch="${cat.name()}">
+        <span th:case="'FRUITS'">🍎</span>
+        <span th:case="'VEGETABLES'">🥕</span>
+        <span th:case="'RICE_GRAINS'">🍚</span>
+        <span th:case="'DALS_PULSES'">🫘</span>
+        <span th:case="'COOKING_ESSENTIALS'">🫒</span>
+        <span th:case="'SPICES_MASALA'">🧂</span>
+        <span th:case="'DAIRY_EGGS'">🥛</span>
+        <span th:case="'BEVERAGES'">☕</span>
+        <span th:case="'SNACKS'">🍪</span>
+        <span th:case="'PERSONAL_CARE'">🧼</span>
+        <span th:case="'HOUSEHOLD'">🧹</span>
+        <span th:case="*">🛒</span>
+      </div>
+      <h4 th:text="${cat.displayName}">Fruits</h4>
+      <span>Shop Now →</span>
+    </a>
+  </div>
+
+  <!-- Offers banner -->
+  <div th:if="${!offers.isEmpty()}" class="offers-banner">
+    <div>
+      <h3>🔥 Today's Offers — Up to 20% OFF!</h3>
+      <p th:text="${offers.size()} + ' products on discount • 10% OFF Rice • 15% OFF Oil • Buy 2 Get 1 on Biscuits'">Offers</p>
+    </div>
+    <a th:href="@{/offers}" class="btn" style="background:#fff;color:#e17055;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:800">View Offers →</a>
+  </div>
+
+  <!-- Section title -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+    <h2 style="color:#0e153a">🛍️ Grocery Products <span style="color:#636e72;font-weight:400;font-size:1rem" th:text="'(' + ${products.size()} + ' items)'">(0)</span></h2>
+    <a th:href="@{/cart}" style="text-decoration:none;color:#6c5ce7;font-weight:700">Cart (<span th:text="${cartCount}">0</span>) →</a>
+  </div>
+
+  <!-- Product Grid -->
+  <div th:if="${products.isEmpty()}" class="mart-alert info">No products found for your search. Try "rice" or select a category.</div>
+
+  <div class="product-grid">
+    <div th:each="p : ${products}" class="product-card">
+      <span th:if="${p.discount > 0}" class="pc-badge" th:text="${p.discount} + '% OFF'">10% OFF</span>
+      <span th:if="${p.stock <= 0}" class="pc-badge out">OUT OF STOCK</span>
+      <span th:if="${p.stock > 0 and p.stock <= p.minStock}" class="pc-badge low">LOW STOCK</span>
+      <a th:href="@{/product/{id}(id=${p.id})}" style="text-decoration:none;color:inherit">
+        <div class="pc-image" th:text="${p.image}">🍎</div>
+      </a>
+      <div class="pc-body">
+        <div class="pc-cat" th:text="${p.category.displayName}">Fruits</div>
+        <a th:href="@{/product/{id}(id=${p.id})}" style="text-decoration:none"><div class="pc-name" th:text="${p.name}">Tomato</div></a>
+        <div class="pc-desc" th:text="${p.description}">Fresh</div>
+        <div class="pc-price-row">
+          <span class="pc-price" th:text="'₹' + ${p.discount > 0 ? p.discountedPrice : p.price} + '/' + ${p.unit}">₹40/kg</span>
+          <span th:if="${p.discount > 0}" class="pc-mrp" th:text="'₹' + ${p.price}">₹50</span>
+          <span th:if="${p.discount > 0}" class="pc-discount" th:text="${p.discount} + '%'">10%</span>
+        </div>
+        <div class="pc-stock" th:classappend="${p.stockStatusClass}" th:text="${p.stockStatus} + ' • Stock: ' + ${p.stock} + ' ' + ${p.unit}">In Stock • 25 kg</div>
+        <form th:action="@{/cart/add}" method="post" style="display:flex;gap:6px;align-items:center;margin-top:6px">
+          <input type="hidden" name="productId" th:value="${p.id}">
+          <div class="qty-controls" style="margin:0">
+            <input type="number" name="quantity" value="1" min="1" th:max="${p.stock > 0 ? p.stock : 1}" style="width:60px">
+          </div>
+          <button class="btn-cart" type="submit" th:disabled="${p.stock <= 0}" th:text="${p.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}">Add to Cart</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:20px;color:#636e72;font-size:0.9rem">© 2026 Dharshini Mart • Fresh groceries delivered to your doorstep • Admin: admin@dharshinimart.com / admin123</div>
+</main>
 </body>
 </html>

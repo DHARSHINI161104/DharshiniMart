@@ -34,6 +34,12 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(length = 20)
+    private String mobile;
+
+    @Column(length = 500)
+    private String address;
+
     public User() {
     }
 
@@ -91,5 +97,21 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
