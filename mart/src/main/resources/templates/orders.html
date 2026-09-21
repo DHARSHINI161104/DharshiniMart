@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Orders')}"></head>
+<body>
+<header th:replace="~{fragments :: navbar(${user})}"></header>
+<main class="container">
+  <h2 style="color:#0e153a;margin:18px 0">📦 Your Orders</h2>
+  <div th:if="${orders.isEmpty()}" class="confirm-box">
+    <div class="tick" style="background:#dfe6e9;color:#636e72">📦</div>
+    <h3>No orders yet</h3>
+    <p style="color:#636e72">Your orders will appear here after checkout.</p>
+    <a th:href="@{/dashboard}" class="btn btn-primary" style="text-decoration:none">Start Shopping</a>
+  </div>
+  <div th:each="order : ${orders}" class="order-card">
+    <div class="order-head">
+      <div>
+        <div class="order-id" th:text="'Order #' + ${order.id} + ' • ' + ${#temporals.format(order.createdAt,'dd MMM yyyy HH:mm')}">Order #1</div>
+        <div style="font-size:0.85rem;color:#636e72" th:text="${order.customerName} + ' • ' + ${order.mobile}">Customer</div>
+      </div>
+      <span class="order-status" th:classappend="${order.status}" th:text="${order.status}">PENDING</span>
+    </div>
+    <div class="order-items">
+      <div th:each="it : ${order.items}" class="order-item"><span th:text="${it.product.name} + ' × ' + ${it.quantity} + ' ' + ${it.unit}">Tomato ×2</span><span th:text="'₹' + ${it.totalPrice}">₹80</span></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;border-top:1px dashed #f1f2f6;padding-top:10px">
+      <strong th:text="'Total: ₹' + ${order.totalAmount}">Total</strong>
+      <div style="display:flex;gap:8px">
+        <a th:href="@{/orders/{id}(id=${order.id})}" class="btn-sm-mini btn-edit" style="text-decoration:none">View</a>
+        <form th:if="${order.status.name()=='PENDING' or order.status.name()=='CONFIRMED'}" th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post"><button class="btn-sm-mini btn-delete" type="submit">Cancel</button></form>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

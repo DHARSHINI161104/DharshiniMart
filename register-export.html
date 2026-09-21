@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | DharshiniMart</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/mart.css">
+</head>
+<body>
+
+<header>
+    <nav class="navbar">
+        <div class="container nav-inner">
+            <a class="brand" href="/">Dharshini<span>Mart</span></a>
+            <div class="nav-links">
+                
+                    <a href="/">Home</a>
+                    <a href="/login">Login</a>
+                    <a class="btn btn-primary btn-sm" href="/register">Register</a>
+                
+                
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="container auth-wrap">
+    <form class="auth-card" action="/register" method="post">
+
+        <h2>Create Account</h2>
+
+        
+
+        <label for="name">Full Name</label>
+        <input id="name" type="text" placeholder="Your name" required name="name" value="">
+        
+
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="you@example.com" required name="email" value="">
+        
+
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="At least 6 characters" required name="password" value="">
+        
+
+        <label for="role">I want to</label>
+        <select id="role" required name="role">
+            <option value="BUYER">BUYER</option>
+            <option value="SELLER">SELLER</option>
+            
+        </select>
+
+        <button class="btn btn-primary btn-block" type="submit">Register</button>
+
+        <p class="auth-alt">Already have an account? <a href="/login">Login here</a></p>
+    </form>
+</main>
+
+</body>
+</html>
