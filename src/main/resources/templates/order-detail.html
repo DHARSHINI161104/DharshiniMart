@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Order Detail')}"></head>
+<body>
+<header th:replace="~{fragments :: navbar(${user})}"></header>
+<main class="container">
+  <a th:href="@{/orders}" style="display:inline-block;margin-top:16px;color:#6c5ce7;text-decoration:none">← Back to Orders</a>
+  <div class="order-card" style="margin-top:14px">
+    <div class="order-head">
+      <div><div class="order-id" th:text="'Order #' + ${order.id}">#1</div><div style="color:#636e72" th:text="${#temporals.format(order.createdAt,'dd MMM yyyy HH:mm')}">date</div></div>
+      <span class="order-status" th:classappend="${order.status}" th:text="${order.status}">PENDING</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;color:#2d3436">
+      <div><strong>Customer</strong><div th:text="${order.customerName}">Name</div><div th:text="${order.mobile}">Mobile</div></div>
+      <div><strong>Delivery Address</strong><div th:text="${order.deliveryAddress}">Addr</div></div>
+    </div>
+    <div class="order-items">
+      <h4 style="color:#0e153a">Products</h4>
+      <div th:each="it : ${order.items}" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f8f9fa">
+        <span><strong th:text="${it.product.name}">Tomato</strong> — <span th:text="${it.quantity} + ' ' + ${it.unit} + ' × ₹' + ${it.unitPrice}"></span></span>
+        <strong th:text="'₹' + ${it.totalPrice}">₹80</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:10px 0"><span>Subtotal</span><span th:text="'₹'+${order.subtotal}">₹0</span></div>
+      <div style="display:flex;justify-content:space-between;padding:10px 0;color:#00b894"><span>Discount</span><span th:text="'-₹'+${order.discountTotal}">-₹0</span></div>
+      <div style="display:flex;justify-content:space-between;padding:10px 0;font-weight:800;font-size:1.1rem"><span>Total</span><span style="color:#00b894" th:text="'₹'+${order.totalAmount}">₹0</span></div>
+    </div>
+    <div th:if="${user.role.name()=='ADMIN'}" style="margin-top:14px;background:#f8f9fa;padding:12px;border-radius:8px">
+      <strong>Admin — Update Status</strong>
+      <form th:action="@{/orders/{id}/status(id=${order.id})}" method="post" style="display:flex;gap:8px;margin-top:8px">
+        <select name="status"><option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${s==order.status}">PENDING</option></select>
+        <button class="btn btn-primary" type="submit">Update</button>
+      </form>
+    </div>
+  </div>
+</main>
+</body>
+</html>

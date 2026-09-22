@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Profile')}"></head>
+<body>
+<header th:replace="~{fragments :: navbar(${user})}"></header>
+<main class="container">
+  <h2 style="color:#0e153a;margin:18px 0">👤 My Profile</h2>
+  <div th:if="${success}" class="mart-alert success" th:text="${success}"></div>
+  <div class="profile-grid">
+    <div class="profile-card">
+      <div class="profile-avatar" th:text="${#strings.substring(user.name,0,1)}">D</div>
+      <h3 th:text="${user.name}">Name</h3>
+      <p th:text="${user.email}">email</p>
+      <p style="margin:8px 0"><span style="background:#6c5ce7;color:#fff;padding:4px 10px;border-radius:20px;font-size:0.8rem" th:text="${user.role}">BUYER</span></p>
+      <div style="text-align:left;margin-top:14px;font-size:0.9rem">
+        <div><strong>Mobile:</strong> <span th:text="${user.mobile != null ? user.mobile : 'Not set'}">-</span></div>
+        <div><strong>Address:</strong> <span th:text="${user.address != null ? user.address : 'Not set'}">-</span></div>
+        <div><strong>Member since:</strong> <span th:text="${#temporals.format(user.createdAt,'dd MMM yyyy')}">date</span></div>
+      </div>
+      <div style="margin-top:12px">
+        <a th:href="@{/orders}" class="btn btn-primary" style="text-decoration:none">My Orders (<span th:text="${orders.size()}">0</span>)</a>
+      </div>
+    </div>
+    <div>
+      <div class="form-card">
+        <h3>Edit Profile</h3>
+        <form th:action="@{/profile/update}" method="post">
+          <label>Full Name</label><input type="text" name="name" th:value="${user.name}" required>
+          <label>Email (cannot change)</label><input type="email" th:value="${user.email}" disabled>
+          <label>Mobile Number</label><input type="tel" name="mobile" th:value="${user.mobile}" placeholder="Enter mobile">
+          <label>Saved Address</label><textarea name="address" rows="3" th:text="${user.address}" placeholder="Your delivery address"></textarea>
+          <button class="btn btn-primary" type="submit" style="margin-top:10px">Save Changes</button>
+        </form>
+      </div>
+      <div class="order-card" style="margin-top:14px">
+        <h3>Recent Orders</h3>
+        <div th:if="${orders.isEmpty()}" style="color:#636e72;padding:10px 0">No orders yet. <a th:href="@{/dashboard}">Start shopping</a></div>
+        <div th:each="o : ${orders}" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f1f2f6">
+          <span th:text="'#' + ${o.id} + ' • ' + ${#temporals.format(o.createdAt,'dd MMM yyyy')} + ' • ₹' + ${o.totalAmount}">#1</span>
+          <span class="order-status" th:classappend="${o.status}" th:text="${o.status}" style="font-size:0.75rem">PENDING</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Checkout')}"></head>
+<body>
+<header th:replace="~{fragments :: navbar(${user})}"></header>
+<main class="container">
+  <h2 style="color:#0e153a;margin:18px 0">Checkout</h2>
+  <div th:if="${error}" class="mart-alert out" th:text="${error}"></div>
+  <div class="checkout-grid">
+    <div class="form-card">
+      <h3>Delivery Details</h3>
+      <form th:action="@{/checkout/place}" method="post">
+        <label>Customer Name</label>
+        <input type="text" name="customerName" th:value="${user.name}" required>
+        <label>Mobile Number</label>
+        <input type="tel" name="mobile" th:value="${user.mobile}" placeholder="10-digit mobile" required>
+        <label>Delivery Address</label>
+        <textarea name="address" rows="3" th:text="${user.address}" placeholder="House no, Street, Area, City, Pincode" required></textarea>
+        <h3 style="margin-top:18px">Payment</h3>
+        <div class="mart-alert info">💳 Cash on Delivery (COD) — Pay when your groceries arrive. Online payment coming soon!</div>
+        <button class="btn-checkout" type="submit">Place Order — ₹<span th:text="${total}">0</span></button>
+      </form>
+    </div>
+    <div class="cart-summary">
+      <h3>Order Summary</h3>
+      <div th:each="it : ${items}" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #f1f2f6">
+        <span th:text="${it.product.name} + ' × ' + ${it.quantity} + ' ' + ${it.product.unit}">Tomato × 2 kg</span>
+        <span th:text="'₹'+${it.lineTotal}">₹80</span>
+      </div>
+      <div class="summary-row"><span>Subtotal</span><span th:text="'₹'+${subtotal}">₹0</span></div>
+      <div class="summary-row"><span>Discount</span><span th:text="'-₹'+${discount}">-₹0</span></div>
+      <div class="summary-row total"><span>Total Amount</span><span th:text="'₹'+${total}">₹0</span></div>
+      <p style="color:#636e72;font-size:0.85rem;margin-top:10px">Stock will be automatically reduced after placing order.</p>
+    </div>
+  </div>
+</main>
+</body>
+</html>

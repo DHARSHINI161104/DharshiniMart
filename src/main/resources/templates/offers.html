@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Offers')}"></head>
+<body>
+<header th:replace="~{fragments :: navbar(${user})}"></header>
+<main class="container">
+  <div class="offers-banner" style="margin-top:18px">
+    <div><h3>🔥 Today's Offers — Save Big!</h3><p>10% OFF on Rice • 15% OFF on Cooking Oil • 20% OFF Snacks • Buy 2 Get 1 Biscuits</p></div>
+    <div style="background:#fff;color:#e17055;padding:8px 14px;border-radius:8px;font-weight:800" th:text="${products.size()} + ' Offers'">0 Offers</div>
+  </div>
+  <div class="product-grid">
+    <div th:each="p : ${products}" class="product-card">
+      <span class="pc-badge" th:text="${p.discount} + '% OFF'"></span>
+      <div class="pc-image" th:text="${p.image}">🍎</div>
+      <div class="pc-body">
+        <div class="pc-cat" th:text="${p.category.displayName}"></div>
+        <div class="pc-name" th:text="${p.name}"></div>
+        <div class="pc-price-row"><span class="pc-price" th:text="'₹' + ${p.discountedPrice} + '/' + ${p.unit}"></span><span class="pc-mrp" th:text="'₹' + ${p.price}"></span><span class="pc-discount" th:text="'-' + ${p.discount} + '%'"></span></div>
+        <div class="pc-stock" th:classappend="${p.stockStatusClass}" th:text="${p.stockStatus}"></div>
+        <form th:action="@{/cart/add}" method="post" style="display:flex;gap:6px;margin-top:6px"><input type="hidden" name="productId" th:value="${p.id}"><input type="number" name="quantity" value="1" min="1" style="width:60px;padding:6px;border:1px solid #dfe6e9;border-radius:6px"><button class="btn-cart">Add to Cart</button></form>
+      </div>
+    </div>
+  </div>
+  <div th:if="${products.isEmpty()}" class="mart-alert info">No offers at the moment.</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' | DharshiniMart'">DharshiniMart</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/mart.css}">
+</head>
+<body>
+
+<header th:fragment="navbar(user)">
+    <nav class="navbar">
+        <div class="container nav-inner">
+            <a class="brand" th:href="@{/}">Dharshini<span>Mart</span></a>
+            <div class="nav-links">
+                <th:block th:if="${user == null}">
+                    <a th:href="@{/}">Home</a>
+                    <a th:href="@{/login}">Login</a>
+                    <a class="btn btn-primary btn-sm" th:href="@{/register}">Register</a>
+                </th:block>
+                <th:block th:if="${user != null}">
+                    <a th:href="@{/dashboard}">Home</a>
+                    <a th:href="@{/shop}">Products</a>
+                    <a th:href="@{/offers}">Offers</a>
+                    <a th:href="@{/cart}">Cart <span th:if="${cartCount != null and cartCount > 0}" class="cart-badge" th:text="${cartCount}">0</span></a>
+                    <a th:href="@{/orders}">Orders</a>
+                    <a th:href="@{/profile}">Profile</a>
+                    <a th:if="${user.role.name() == 'ADMIN'}" th:href="@{/admin/stock}" class="admin-link">Admin</a>
+                    <span class="nav-user" th:text="'Hi, ' + ${user.name}">Hi</span>
+                    <a th:href="@{/logout}">Logout</a>
+                </th:block>
+            </div>
+        </div>
+    </nav>
+</header>
+
+</body>
+</html>
