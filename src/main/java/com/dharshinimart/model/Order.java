@@ -43,6 +43,9 @@ public class Order {
     @Column(length = 100)
     private String customerName;
 
+    @Column(length = 50)
+    private String paymentMethod = "Cash on Delivery (COD)";
+
     public Order() {
         this.createdAt = LocalDateTime.now();
         this.status = OrderStatus.PENDING;
@@ -70,4 +73,6 @@ public class Order {
     public void setMobile(String mobile) { this.mobile = mobile; }
     public String getCustomerName() { return customerName; }
     public void setCustomerName(String customerName) { this.customerName = customerName; }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 }

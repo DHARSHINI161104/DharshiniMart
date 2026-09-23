@@ -43,6 +43,7 @@ public class OrderService {
         order.setMobile(mobile);
         order.setDeliveryAddress(address);
         order.setStatus(OrderStatus.CONFIRMED);
+        order.setPaymentMethod("Cash on Delivery (COD)");
         order.setSubtotal(cartService.getSubtotal(session, productService));
         order.setTotalAmount(cartService.getTotal(session, productService));
         order.setDiscountTotal(cartService.getDiscount(session, productService));
@@ -62,14 +63,17 @@ public class OrderService {
         return saved;
     }
 
+    @Transactional(readOnly = true)
     public List<Order> findByUser(Long userId) {
         return orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
+    @Transactional(readOnly = true)
     public List<Order> findAll() {
         return orderRepository.findAllByOrderByCreatedAtDesc();
     }
 
+    @Transactional(readOnly = true)
     public Order findById(Long id) {
         return orderRepository.findById(id).orElse(null);
     }

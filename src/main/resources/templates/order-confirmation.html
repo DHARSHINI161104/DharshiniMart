@@ -11,15 +11,22 @@
     <p>Order ID: <strong th:text="'#' + ${order.id}">#1</strong> • Status: <span class="order-status" th:classappend="${order.status}" th:text="${order.status}">CONFIRMED</span></p>
     <div style="text-align:left;background:#f8f9fa;padding:16px;border-radius:10px;margin:16px 0">
       <div th:each="item : ${order.items}" style="display:flex;justify-content:space-between;padding:6px 0">
-        <span th:text="${item.product.name} + ' × ' + ${item.quantity} + ' ' + ${item.unit}">Tomato × 2 kg</span>
+        <span><strong th:text="${item.product.name}">Tomato</strong> — <span th:text="${item.quantity} + ' ' + ${item.unit} + ' × ₹' + ${item.unitPrice}">2 kg × ₹40</span></span>
         <span th:text="'₹' + ${item.totalPrice}">₹80</span>
       </div>
-      <div style="display:flex;justify-content:space-between;font-weight:800;border-top:1px solid #dfe6e9;padding-top:8px;margin-top:8px">
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid #dfe6e9;margin-top:8px">
+        <span>Subtotal</span><span th:text="'₹' + ${order.subtotal}">₹0</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;color:#00b894">
+        <span>Discount</span><span th:text="'-₹' + ${order.discountTotal}">-₹0</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-weight:800;border-top:1px solid #dfe6e9;padding-top:8px;margin-top:4px">
         <span>Total Paid</span><span style="color:#00b894" th:text="'₹' + ${order.totalAmount}">₹405</span>
       </div>
-      <div style="margin-top:10px;font-size:0.9rem;color:#636e72">
+      <div style="margin-top:12px;font-size:0.9rem;color:#636e72;border-top:1px dashed #dfe6e9;padding-top:10px">
         <div>Customer: <span th:text="${order.customerName}">Name</span> • <span th:text="${order.mobile}">Mobile</span></div>
-        <div>Address: <span th:text="${order.deliveryAddress}">Address</span></div>
+        <div>Delivery Address: <span th:text="${order.deliveryAddress}">Address</span></div>
+        <div>Payment Method: <span th:text="${order.paymentMethod != null ? order.paymentMethod : 'Cash on Delivery (COD)'}">Cash on Delivery (COD)</span></div>
         <div>Date: <span th:text="${#temporals.format(order.createdAt,'dd MMM yyyy HH:mm')}">date</span></div>
       </div>
     </div>
