@@ -7,7 +7,10 @@
   <a th:href="@{/dashboard}" style="display:inline-block;margin-top:16px;color:#6c5ce7;text-decoration:none">← Back to Dashboard</a>
   <div th:if="${error}" class="mart-alert out" th:text="${error}"></div>
   <div class="pd-wrap">
-    <div class="pd-image" th:text="${product.image}">🍎</div>
+    <div class="pd-image">
+    <img th:if="${product.image != null and product.image.startsWith('/images/')}" th:src="@{${product.image}}" alt="${product.name}" style="width:100%;height:100%;object-fit:cover;border-radius:12px">
+    <span th:if="${product.image == null or not product.image.startsWith('/images/')}" th:text="${product.image}">🍎</span>
+</div>
     <div class="pd-info">
       <div class="pd-cat" th:text="${product.category.displayName}">Fruits</div>
       <h1 th:text="${product.name}">Tomato</h1>

@@ -21,7 +21,7 @@
     <div th:each="p : ${products}" class="product-card">
       <span th:if="${p.discount > 0}" class="pc-badge" th:text="${p.discount} + '% OFF'"></span>
       <span th:if="${p.stock <= 0}" class="pc-badge out">OUT OF STOCK</span>
-      <a th:href="@{/product/{id}(id=${p.id})}" style="text-decoration:none;color:inherit"><div class="pc-image" th:text="${p.image}">🍎</div></a>
+      <a th:href="@{/product/{id}(id=${p.id})}" style="text-decoration:none;color:inherit"><div class="pc-image"><img th:if="${p.image != null and p.image.startsWith('/images/')}" th:src="@{${p.image}}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:8px 8px 0 0"><span th:if="${p.image == null or not p.image.startsWith('/images/')}" th:text="${p.image}">🍎</span></div></a>
       <div class="pc-body">
         <div class="pc-cat" th:text="${p.category.displayName}"></div>
         <a th:href="@{/product/{id}(id=${p.id})}"><div class="pc-name" th:text="${p.name}"></div></a>
